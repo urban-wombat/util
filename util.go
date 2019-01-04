@@ -45,6 +45,7 @@ func init() {
 }
 var where = log.Print
 
+
 /*
 	Utility function to test string flags.
 
@@ -52,21 +53,28 @@ var where = log.Print
 
 	It can be called and:-
 
-	- Compulsory flags can trust the existence of an argument.
+	(1) Required flags can trust the existence of an argument.
 
-		// Compulsory flag.
-		const compulsoryFlag = true
-		_, err := util.CheckStringFlag("f", flags.f, compulsoryFlag)
-		if err != nil {
+		// Required flag.
+		exists, err := util.CheckStringFlag("r", flags.r, util.FlagRequired)
+		if !exists {
 			fmt.Fprintf(os.Stderr, "%v\n", err)
-			fmt.Fprintf(os.Stderr, "Expecting infile: -f <gotables-file>\n")
-			printUsage()
 			os.Exit(1)
 		}
 
-	- Optional flags can test exists.
+	(2) Optional flags can test exists.
+
+		// Optional flag.
+		exists, err := util.CheckStringFlag("o", flags.o, util.FlagOptional)
+		if exists {
+			// Do something with flag.
+		}
 */
-func CheckStringFlag(name string, arg string, compulsory bool) (exists bool, err error) {
+const (
+	FlagRequired = true
+	FlagOptional = false
+)
+func CheckStringFlag(name string, arg string, required bool) (exists bool, err error) {
     var hasValidLookingArg bool
 
     if arg != "" {
@@ -80,18 +88,18 @@ func CheckStringFlag(name string, arg string, compulsory bool) (exists bool, err
         hasValidLookingArg = true
     }
 /*
-    where(fmt.Sprintf("-%s compulsory         = %t", name, compulsory))
+    where(fmt.Sprintf("-%s required           = %t", name, required))
     where(fmt.Sprintf("-%s exists             = %t", name, exists))
     where(fmt.Sprintf("-%s hasValidLookingArg = %t", name, hasValidLookingArg))
     where(fmt.Sprintf("-%s value              = %s", name, arg))
 */
-    if compulsory && !exists {
-        err = fmt.Errorf("missing compulsory flag: -%s\n", name)
+    if required && !exists {
+        err = fmt.Errorf("missing required flag: -%s", name)
         return false, err
     }
 
     if exists && !hasValidLookingArg {
-        fmt.Errorf("flag -%s needs a valid argument (not: %s)\n", name, arg)
+        fmt.Errorf("flag -%s needs a valid argument (not: %s)", name, arg)
         return false, err
     }
 
@@ -316,7 +324,7 @@ func WordSize() int {
 }
 
 // Check to see if this program can read piped input.
-func CanReadStdin() (bool, error) {
+func CanReadFromPipe() (bool, error) {
 	info, err := os.Stdin.Stat()
 	if err != nil {
 		return false, err
@@ -330,7 +338,7 @@ func CanReadStdin() (bool, error) {
 }
 
 // Read and return piped input as a string.
-func GulpStdin() (string, error) {
+func GulpFromPipe() (string, error) {
 	reader := bufio.NewReader(os.Stdin)
 	var output []rune
 	for {
