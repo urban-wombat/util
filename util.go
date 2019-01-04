@@ -1,8 +1,10 @@
 package util
 
 import (
+	"bufio"
 	"bytes"
 	"fmt"
+	"io"
 	"log"
 	"math"
 	"os"
@@ -10,7 +12,6 @@ import (
 	"path/filepath"
 	"runtime"
 	"strings"
-	"golang.org/x/crypto/ssh/terminal"
 )
 
 /*
@@ -51,9 +52,19 @@ var where = log.Print
 
 	It can be called and:-
 
-		- Compulsory flags can trust the existence of an argument.
+	- Compulsory flags can trust the existence of an argument.
 
-		- Optional flags can test exists.
+		// Compulsory flag.
+		const compulsoryFlag = true
+		_, err := util.CheckStringFlag("f", flags.f, compulsoryFlag)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "%v\n", err)
+			fmt.Fprintf(os.Stderr, "Expecting infile: -f <gotables-file>\n")
+			printUsage()
+			os.Exit(1)
+		}
+
+	- Optional flags can test exists.
 */
 func CheckStringFlag(name string, arg string, compulsory bool) (exists bool, err error) {
     var hasValidLookingArg bool
@@ -74,7 +85,6 @@ func CheckStringFlag(name string, arg string, compulsory bool) (exists bool, err
     where(fmt.Sprintf("-%s hasValidLookingArg = %t", name, hasValidLookingArg))
     where(fmt.Sprintf("-%s value              = %s", name, arg))
 */
-
     if compulsory && !exists {
         err = fmt.Errorf("missing compulsory flag: -%s\n", name)
         return false, err
@@ -127,16 +137,6 @@ func FilepathAbs(inputPath string) (path string, err error) {
 	}
 
 	return
-}
-
-/*
-	Doesn't work (for either Stdin or Stdout).
-*/
-func isTerminalStdin() bool {
-	if terminal.IsTerminal(int(os.Stdin.Fd())) {
-		return true
-	}
-	return false
 }
 
 /*
@@ -313,4 +313,37 @@ func Round(val float64, places int) (rounded float64) {
 */
 func WordSize() int {
 	return 32 << (^uint(0) >> 32 & 1)
+}
+
+// Check to see if this program can read piped input.
+func CanReadStdin() (bool, error) {
+	info, err := os.Stdin.Stat()
+	if err != nil {
+		return false, err
+	}
+
+	if info.Mode() & os.ModeCharDevice != 0 || info.Size() <= 0 {
+		return true, nil
+	}
+
+	return false, nil
+}
+
+// Read and return piped input as a string.
+func GulpStdin() (string, error) {
+	reader := bufio.NewReader(os.Stdin)
+	var output []rune
+	for {
+		inputRune, _, err := reader.ReadRune()
+		if err != nil && err == io.EOF {
+			break
+		}
+		if err != nil {
+			return "", err
+		}
+
+		output = append(output, inputRune)
+	}
+
+	return string(output), nil
 }
