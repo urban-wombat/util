@@ -16,6 +16,8 @@ import (
 
 /*
 	Utility functions that don't fit in any particular package and may be needed by any package.
+
+	These are not considered part of the `gotables` interface surface and may change at any time.
 */
 
 /*
@@ -45,6 +47,42 @@ func init() {
 }
 var where = log.Print
 
+type StringFlag struct {
+	set bool
+	val string
+	exists bool
+	err error
+}
+
+func (sf *StringFlag) Set(s string) error {
+	sf.exists = true
+
+	if strings.HasPrefix(s, "-") {
+		sf.val = s
+		sf.err = fmt.Errorf("flag needs a valid string argument, not %s", sf.val)
+	} else {
+		sf.set = true
+		sf.val = s
+	}
+
+	return nil
+}
+
+func (sf *StringFlag) String() string {
+	return sf.val
+}
+
+func (sf *StringFlag) IsSet() bool {
+	return sf.set
+}
+
+func (sf *StringFlag) Exists() bool {
+	return sf.exists
+}
+
+func (sf *StringFlag) Error() error {
+	return sf.err
+}
 
 /*
 	Utility function to test string flags.
