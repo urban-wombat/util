@@ -3,6 +3,7 @@ package util
 import (
 	"bufio"
 	"bytes"
+	"context"
 	"fmt"
 	"io"
 	"log"
@@ -12,6 +13,7 @@ import (
 	"path/filepath"
 	"runtime"
 	"strings"
+	"time"
 )
 
 /*
@@ -375,8 +377,29 @@ func CanReadFromPipe() (bool, error) {
 	return false, nil
 }
 
+func GulpFromPipeWithTimeout(timeout time.Duration) (input string, err error) {
+where("GulpFromPipeWithTimeout")
+	ctx, cancel := context.WithTimeout(context.Background(), timeout)
+where("defer cancel()")
+	defer cancel()
+
+where("BEFORE go input, err = GulpFromPipe()")
+	go func() {
+		input, err = GulpFromPipe()
+	}()
+where("AFTER go input, err = GulpFromPipe()")
+	select {
+		case <-ctx.Done():
+where("case <-ctx.Done():")
+			return "", fmt.Errorf("(1) Didn't see any piped input before timeout: %v", timeout)
+	}
+
+	return "", fmt.Errorf("(2) Didn't see any piped input before timeout: %v", timeout)
+}
+
 // Read and return piped input as a string.
 func GulpFromPipe() (string, error) {
+
 	reader := bufio.NewReader(os.Stdin)
 	var output []rune
 	for {
@@ -392,4 +415,13 @@ func GulpFromPipe() (string, error) {
 	}
 
 	return string(output), nil
+}
+
+func IsCommandInstalled(commandName string) (bool, error) {
+	path, err := exec.LookPath(commandName)
+	if err != nil {
+		return false, fmt.Errorf("%v: command %s is not installed in path %s", err, commandName, path)
+	}
+
+	return true, nil
 }
