@@ -70,11 +70,11 @@ func (sf *StringFlag) Set(s string) error {
 	return nil
 }
 
-func (sf *StringFlag) String() string {
+func (sf *StringFlag) string() string {
 	return sf.val
 }
 
-func (sf *StringFlag) IsSet() bool {
+func (sf *StringFlag) isSet() bool {
 	return sf.set
 }
 
@@ -82,7 +82,7 @@ func (sf *StringFlag) Exists() bool {
 	return sf.exists
 }
 
-func (sf *StringFlag) Error() error {
+func (sf *StringFlag) error() error {
 	return sf.err
 }
 
@@ -114,7 +114,7 @@ const (
 	FlagRequired = true
 	FlagOptional = false
 )
-func CheckStringFlag(name string, arg string, required bool) (exists bool, err error) {
+func checkStringFlag(name string, arg string, required bool) (exists bool, err error) {
     var hasValidLookingArg bool
 
     if arg != "" {
@@ -157,7 +157,7 @@ func CheckStringFlag(name string, arg string, required bool) (exists bool, err e
 
 	It should return: "C:/mypath/myfile"
 */
-func FilepathAbs(inputPath string) (path string, err error) {
+func filepathAbs(inputPath string) (path string, err error) {
 	var OSTYPE string
 	const cygwinRootOfAllDrives = "/cygdrive/"
 	if strings.HasPrefix(inputPath, cygwinRootOfAllDrives) {
@@ -241,7 +241,7 @@ func GoFmtProgramString(goProgramString string) (formattedGoProgramString string
 	This is intentionally a print-only function because calling it from another function (other than the one being
 	tracked) will change the calling information by nesting to an additional level.
 */
-func PrintCaller() {
+func printCaller() {
 	var calledName string
 	var callerFile string
 	var callerName string
@@ -262,12 +262,12 @@ func PrintCaller() {
 	// Skip 1 level to get the called: the name of the function calling PrintCaller()
 	n = runtime.Callers(2, fpcs)
 	if n == 0 {
-		_, _ = fmt.Fprintf(os.Stderr, "%s ERROR: no called\n", FuncName())
+		_, _ = fmt.Fprintf(os.Stderr, "%s ERROR: no called\n", funcName())
 		return
 	}
 	called := runtime.FuncForPC(fpcs[0]-1)
 	if called == nil {
-		_, _ = fmt.Fprintf(os.Stderr, "%s ERROR: called was nil\n", FuncName())
+		_, _ = fmt.Fprintf(os.Stderr, "%s ERROR: called was nil\n", funcName())
 		return
 	}
 	calledName = called.Name()
@@ -276,12 +276,12 @@ func PrintCaller() {
 	// Skip 2 levels to get the caller
 	n = runtime.Callers(3, fpcs)
 	if n == 0 {
-		_, _ = fmt.Fprintf(os.Stderr, "%s ERROR: no caller\n", FuncName())
+		_, _ = fmt.Fprintf(os.Stderr, "%s ERROR: no caller\n", funcName())
 		return
 	}
 	caller := runtime.FuncForPC(fpcs[0]-1)
 	if caller == nil {
-		_, _ = fmt.Fprintf(os.Stderr, "%s ERROR: caller was nil\n", FuncName())
+		_, _ = fmt.Fprintf(os.Stderr, "%s ERROR: caller was nil\n", funcName())
 		return
 	}
 	callerName = caller.Name()
@@ -295,7 +295,7 @@ func PrintCaller() {
 	_, _ = fmt.Fprintf(os.Stderr, "%s called by %s at %s\n", calledName, callerName, callerFile)
 }
 
-func FuncName() string {
+func funcName() string {
 	pc, _, _, _ := runtime.Caller(1)
 	nameFull := runtime.FuncForPC(pc).Name() // main.foo
 	nameEnd := filepath.Ext(nameFull)        // .foo
@@ -303,7 +303,7 @@ func FuncName() string {
 	return name + "()"
 }
 
-func FuncNameNoParens() string {
+func funcNameNoParens() string {
 	pc, _, _, _ := runtime.Caller(1)
 	nameFull := runtime.FuncForPC(pc).Name() // main.foo
 	nameEnd := filepath.Ext(nameFull)        // .foo
@@ -311,7 +311,7 @@ func FuncNameNoParens() string {
 	return name
 }
 
-func FuncNameFull() string {
+func funcNameFull() string {
 	pc, sourceFile, lineNumber, ok := runtime.Caller(1)
 	if !ok {
 		return "Could not obtain func name and source file information."
@@ -320,7 +320,7 @@ func FuncNameFull() string {
 	return fmt.Sprintf("%s[%d] %s", sourceFile, lineNumber, nameFull)
 }
 
-func FuncSource() string {
+func funcSource() string {
 	_, sourceFile, lineNumber, ok := runtime.Caller(1)
 	if !ok {
 		return "Could not obtain func name and source file information."
@@ -336,7 +336,7 @@ Round up if fraction is >= 0.5 otherwise round down.
 
 From: https://medium.com/@edoardo849/mercato-how-to-build-an-effective-web-scraper-with-golang-e2918d279f49#.istjzw4nl
 */
-func Round(val float64, places int) (rounded float64) {
+func round(val float64, places int) (rounded float64) {
 	const roundOn = 0.5 // Round up if fraction is >= 0.5 otherwise round down.
 	var round float64
 	pow := math.Pow(10, float64(places))
@@ -356,12 +356,12 @@ func Round(val float64, places int) (rounded float64) {
 
 	Or use: intBits := strconv.IntSize
 */
-func WordSize() int {
+func wordSize() int {
 	return 32 << (^uint(0) >> 32 & 1)
 }
 
 // Check to see if this program can read piped input.
-func CanReadFromPipe() (bool, error) {
+func canReadFromPipe() (bool, error) {
 	info, err := os.Stdin.Stat()
 	if err != nil {
 		return false, err
@@ -374,7 +374,7 @@ func CanReadFromPipe() (bool, error) {
 	return false, nil
 }
 
-func GulpFromPipeWithTimeout(timeout time.Duration) (input string, err error) {
+func gulpFromPipeWithTimeout(timeout time.Duration) (input string, err error) {
 where("GulpFromPipeWithTimeout")
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 where("defer cancel()")
@@ -382,7 +382,7 @@ where("defer cancel()")
 
 where("BEFORE go input, err = GulpFromPipe()")
 	go func() {
-		input, err = GulpFromPipe()
+		input, err = gulpFromPipe()
 	}()
 where("AFTER go input, err = GulpFromPipe()")
 	select {
@@ -395,7 +395,7 @@ where("case <-ctx.Done():")
 }
 
 // Read and return piped input as a string.
-func GulpFromPipe() (string, error) {
+func gulpFromPipe() (string, error) {
 
 	reader := bufio.NewReader(os.Stdin)
 	var output []rune
@@ -414,7 +414,7 @@ func GulpFromPipe() (string, error) {
 	return string(output), nil
 }
 
-func IsCommandInstalled(commandName string) (bool, error) {
+func isCommandInstalled(commandName string) (bool, error) {
 	path, err := exec.LookPath(commandName)
 	if err != nil {
 		return false, fmt.Errorf("%v: command %s is not installed in path %s", err, commandName, path)
