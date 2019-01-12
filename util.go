@@ -139,7 +139,7 @@ func CheckStringFlag(name string, arg string, required bool) (exists bool, err e
     }
 
     if exists && !hasValidLookingArg {
-        fmt.Errorf("flag -%s needs a valid argument (not: %s)", name, arg)
+        err = fmt.Errorf("flag -%s needs a valid argument (not: %s)", name, arg)
         return false, err
     }
 
@@ -168,13 +168,12 @@ func FilepathAbs(inputPath string) (path string, err error) {
 		// Use cygwin utility cygpath to convert cygwin path to windows path.
 		const executable = "cygpath"
 		const flag = "-w"
-		var cmd *exec.Cmd
-		cmd = exec.Command(executable, flag, inputPath)
+		var cmd *exec.Cmd = exec.Command(executable, flag, inputPath)
 		var out bytes.Buffer
 		cmd.Stdout = &out
 		err = cmd.Run()
 		if err != nil {
-			fmt.Errorf("%s exit code %v error: %s", executable, err, out.String())
+			err = fmt.Errorf("%s exit code %v error: %s", executable, err, out.String())
 			return
 		}
 		path = out.String()
@@ -210,11 +209,9 @@ func GoFmtProgramString(goProgramString string) (formattedGoProgramString string
 	// We return the input string even if error, so as to not crunch it in the calling function.
 	formattedGoProgramString = goProgramString
 
-	var cmd *exec.Cmd
-	cmd = exec.Command("gofmt")
+	var cmd *exec.Cmd = exec.Command("gofmt")
 
-	var fileBytes []byte
-	fileBytes = []byte(goProgramString)
+	var fileBytes []byte = []byte(goProgramString)
 	cmd.Stdin = bytes.NewBuffer(fileBytes)
 
 	var out bytes.Buffer
