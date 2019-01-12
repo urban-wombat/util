@@ -157,7 +157,7 @@ func checkStringFlag(name string, arg string, required bool) (exists bool, err e
 
 	It should return: "C:/mypath/myfile"
 */
-func filepathAbs(inputPath string) (path string, err error) {
+func FilepathAbs(inputPath string) (path string, err error) {
 	var OSTYPE string
 	const cygwinRootOfAllDrives = "/cygdrive/"
 	if strings.HasPrefix(inputPath, cygwinRootOfAllDrives) {
