@@ -201,7 +201,7 @@ func FilepathAbs(inputPath string) (path string, err error) {
 		// goProgramString has been formatted by gofmt
 
 	Because this function calls out to gofmt in the operating system, the potential
-	for failure is possible on some machines (and not testable by me during development).
+	for failure is possible on some machines (and hence not testable during development).
 	Hence a more forgiving return of its input string so as to avoid crunching user data.
 */
 func GoFmtProgramString(goProgramString string) (formattedGoProgramString string, err error) {
@@ -359,7 +359,7 @@ func WordSize() int {
 	return 32 << (^uint(0) >> 32 & 1)
 }
 
-// Check to see if this program can read piped input.
+// Check to see if this program can read piped input on this machine.
 func CanReadFromPipe() (bool, error) {
 	info, err := os.Stdin.Stat()
 	if err != nil {
