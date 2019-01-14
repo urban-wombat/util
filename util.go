@@ -3,7 +3,6 @@ package util
 import (
 	"bufio"
 	"bytes"
-	"context"
 	"fmt"
 	"io"
 	"log"
@@ -374,27 +373,13 @@ func CanReadFromPipe() (bool, error) {
 	return false, nil
 }
 
-func GulpFromPipeWithTimeout(timeout time.Duration) (input string, err error) {
-where("GulpFromPipeWithTimeout")
-	ctx, cancel := context.WithTimeout(context.Background(), timeout)
-where("defer cancel()")
-	defer cancel()
+/*
+	Read and return piped input as a string.
 
-where("BEFORE go input, err = GulpFromPipe()")
-	go func() {
-		input, err = GulpFromPipe()
-	}()
-where("AFTER go input, err = GulpFromPipe()")
-	select {
-		case <-ctx.Done():
-where("case <-ctx.Done():")
-			return "", fmt.Errorf("(1) Didn't see any piped input before timeout: %v", timeout)
-	}
+	Beware: this blocks waiting for stdin.
 
-	return "", fmt.Errorf("(2) Didn't see any piped input before timeout: %v", timeout)
-}
-
-// Read and return piped input as a string.
+		stdin, err := util.GulpFromPipe()
+*/
 func GulpFromPipe() (string, error) {
 
 	reader := bufio.NewReader(os.Stdin)
@@ -414,6 +399,33 @@ func GulpFromPipe() (string, error) {
 	return string(output), nil
 }
 
+
+/*
+	Read and return piped input as a string.
+
+	This waits for stdin but only until timeout expires.
+
+		stdin, err := util.GulpFromPipe(1 * time.Second)
+*/
+func GulpFromPipeWithTimeout(timeout time.Duration) (input string, err error) {
+
+	c1 := make(chan string, 1)
+
+	go func() {
+		input, err = GulpFromPipe()
+		c1 <- input
+	}()
+
+	select {
+		case result := <- c1:
+			return result, nil
+		case <- time.After(timeout):
+			return "", fmt.Errorf("did not read any piped input from stdin after waiting %v", timeout)
+	}
+
+	return
+}
+
 func IsCommandInstalled(commandName string) (bool, error) {
 	path, err := exec.LookPath(commandName)
 	if err != nil {
@@ -421,4 +433,8 @@ func IsCommandInstalled(commandName string) (bool, error) {
 	}
 
 	return true, nil
+}
+
+func ProgName() string {
+	return filepath.Base(os.Args[0])
 }
