@@ -48,13 +48,21 @@ func init() {
 }
 var where = log.Print
 
+/*
+StringFlag implements the flag.Value interface https://golang.org/pkg/flag/#Value
+	type Value interface {
+		String() string
+		Set(string) error
+	}
+*/
 type StringFlag struct {
-	set bool
-	val string
+	val string	// string field used by the flag.Value interface https://golang.org/pkg/flag/#Value
 	exists bool
+	set bool
 	err error
 }
 
+// Set() implements part of the flag.Value interface https://golang.org/pkg/flag/#Value
 func (sf *StringFlag) Set(s string) error {
 	sf.exists = true
 
@@ -69,20 +77,45 @@ func (sf *StringFlag) Set(s string) error {
 	return nil
 }
 
+// String() implements part of the flag.Value interface https://golang.org/pkg/flag/#Value
 func (sf *StringFlag) String() string {
 	return sf.val
 }
 
-func (sf *StringFlag) IsSet() bool {
-	return sf.set
-}
-
+// Exists() is specific to gotables.Util
 func (sf *StringFlag) Exists() bool {
 	return sf.exists
 }
 
+// IsSet() is specific to gotables.Util
+func (sf *StringFlag) IsSet() bool {
+	return sf.set
+}
+
+// Error() is specific to gotables.Util
 func (sf *StringFlag) Error() error {
 	return sf.err
+}
+
+/*
+AllGood() is specific to gotables.Util
+It means:-
+	(1) flag exists
+	(2) flag is set
+	(3) error is nil
+*/
+func (sf *StringFlag) AllOk() bool {
+	return (sf.Exists() && sf.IsSet() && sf.Error() == nil)
+}
+
+// Print to stdout StringFlag field values and method results.
+func (sf *StringFlag) Print() {
+	fmt.Printf("%#v\n", sf)
+	fmt.Printf("&util.StringFlag.String() = %q\n", sf.String())
+	fmt.Printf("&util.StringFlag.Exists() = %t\n", sf.Exists())
+	fmt.Printf("&util.StringFlag.IsSet()  = %t\n", sf.IsSet())
+	fmt.Printf("&util.StringFlag.Error()  = %v\n", sf.Error())
+	fmt.Printf("&util.StringFlag.AllOk()  = %v\n", sf.AllOk())
 }
 
 /*
