@@ -98,7 +98,7 @@ func (sf *StringFlag) Error() error {
 }
 
 /*
-AllGood() is specific to gotables.Util
+AllOk() is specific to gotables.Util
 It means:-
 	(1) flag exists
 	(2) flag is set
