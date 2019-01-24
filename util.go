@@ -459,6 +459,9 @@ func GulpFromPipeWithTimeout(timeout time.Duration) (input string, err error) {
 	return
 }
 
+/*
+	Check whether commandName is installed on this machine.
+*/
 func IsCommandInstalled(commandName string) (bool, error) {
 	path, err := exec.LookPath(commandName)
 	if err != nil {
