@@ -110,12 +110,12 @@ func (sf *StringFlag) AllOk() bool {
 
 // Print to stdout StringFlag field values and method results.
 func (sf *StringFlag) Print() {
-	fmt.Printf("%#v\n", sf)
-	fmt.Printf("&util.StringFlag.String() = %q\n", sf.String())
-	fmt.Printf("&util.StringFlag.Exists() = %t\n", sf.Exists())
-	fmt.Printf("&util.StringFlag.IsSet()  = %t\n", sf.IsSet())
-	fmt.Printf("&util.StringFlag.Error()  = %v\n", sf.Error())
-	fmt.Printf("&util.StringFlag.AllOk()  = %v\n", sf.AllOk())
+	fmt.Fprintf(os.Stderr, "%#v\n", sf)
+	fmt.Fprintf(os.Stderr, "&util.StringFlag.String() = %q\n", sf.String())
+	fmt.Fprintf(os.Stderr, "&util.StringFlag.Exists() = %t\n", sf.Exists())
+	fmt.Fprintf(os.Stderr, "&util.StringFlag.IsSet()  = %t\n", sf.IsSet())
+	fmt.Fprintf(os.Stderr, "&util.StringFlag.Error()  = %v\n", sf.Error())
+	fmt.Fprintf(os.Stderr, "&util.StringFlag.AllOk()  = %v\n", sf.AllOk())
 }
 
 /*
