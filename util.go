@@ -46,6 +46,7 @@ SOFTWARE.
 func init() {
 	log.SetFlags(log.Lshortfile) // For var where
 }
+
 var where = log.Print
 
 /*
@@ -56,10 +57,10 @@ StringFlag implements the flag.Value interface https://golang.org/pkg/flag/#Valu
 	}
 */
 type StringFlag struct {
-	val string	// string field used by the flag.Value interface https://golang.org/pkg/flag/#Value
+	val    string // string field used by the flag.Value interface https://golang.org/pkg/flag/#Value
 	exists bool
-	set bool
-	err error
+	set    bool
+	err    error
 }
 
 // Set() implements part of the flag.Value interface https://golang.org/pkg/flag/#Value
@@ -146,36 +147,37 @@ const (
 	FlagRequired = true
 	FlagOptional = false
 )
+
 func CheckStringFlag(name string, arg string, required bool) (exists bool, err error) {
-    var hasValidLookingArg bool
+	var hasValidLookingArg bool
 
-    if arg != "" {
-        exists = true
-    }
+	if arg != "" {
+		exists = true
+	}
 
-    // Try to detect missing flag argument.
-    // If an argument is another flag, argument has not been provided.
-    if exists && !strings.HasPrefix(arg, "-") {
-        // Option expecting an argument but has been followed by another flag.
-        hasValidLookingArg = true
-    }
-/*
-    where(fmt.Sprintf("-%s required           = %t", name, required))
-    where(fmt.Sprintf("-%s exists             = %t", name, exists))
-    where(fmt.Sprintf("-%s hasValidLookingArg = %t", name, hasValidLookingArg))
-    where(fmt.Sprintf("-%s value              = %s", name, arg))
-*/
-    if required && !exists {
-        err = fmt.Errorf("missing required flag: -%s", name)
-        return false, err
-    }
+	// Try to detect missing flag argument.
+	// If an argument is another flag, argument has not been provided.
+	if exists && !strings.HasPrefix(arg, "-") {
+		// Option expecting an argument but has been followed by another flag.
+		hasValidLookingArg = true
+	}
+	/*
+	   where(fmt.Sprintf("-%s required           = %t", name, required))
+	   where(fmt.Sprintf("-%s exists             = %t", name, exists))
+	   where(fmt.Sprintf("-%s hasValidLookingArg = %t", name, hasValidLookingArg))
+	   where(fmt.Sprintf("-%s value              = %s", name, arg))
+	*/
+	if required && !exists {
+		err = fmt.Errorf("missing required flag: -%s", name)
+		return false, err
+	}
 
-    if exists && !hasValidLookingArg {
-        err = fmt.Errorf("flag -%s needs a valid argument (not: %s)", name, arg)
-        return false, err
-    }
+	if exists && !hasValidLookingArg {
+		err = fmt.Errorf("flag -%s needs a valid argument (not: %s)", name, arg)
+		return false, err
+	}
 
-    return
+	return
 }
 
 /*
@@ -196,7 +198,7 @@ func FilepathAbs(inputPath string) (path string, err error) {
 		OSTYPE = "cygwin"
 		// OSTYPE := os.Getenv("OSTYPE")	// Is not helpful (returns nothing on Windows 10)
 	}
-	if OSTYPE == "cygwin" {	// Atypical case: cygwin drive.
+	if OSTYPE == "cygwin" { // Atypical case: cygwin drive.
 		// Use cygwin utility cygpath to convert cygwin path to windows path.
 		const executable = "cygpath"
 		const flag = "-w"
@@ -211,7 +213,7 @@ func FilepathAbs(inputPath string) (path string, err error) {
 		path = out.String()
 		// cygpath or cygwin bash appends path with an unwelcome new line.
 		path = strings.Replace(path, "\n", "", -1)
-	} else {	// Typical case.
+	} else { // Typical case.
 		path, err = filepath.Abs(inputPath)
 	}
 
@@ -219,6 +221,10 @@ func FilepathAbs(inputPath string) (path string, err error) {
 }
 
 /*
+	NOTE: As per egonelbre (https://www.reddit.com/user/egonelbre) suggestion, gotables
+	and flattables now calls go/format/Source() to format code.
+	GoFmtProgramString() will be deprecated at some point.
+
 	Pipe a Go program file (as a string) through the Go tool gofmt and return its output.
 
 	Use it to tidy up generated Go source code before writing it to file.
@@ -250,7 +256,9 @@ func GoFmtProgramString(goProgramString string) (formattedGoProgramString string
 	cmd.Stdout = &out
 
 	err = cmd.Run()
-	if err != nil { return }
+	if err != nil {
+		return
+	}
 
 	formattedGoProgramString = out.String()
 
@@ -277,7 +285,7 @@ func PrintCaller() {
 	var calledName string
 	var callerFile string
 	var callerName string
-	var n int	// number of callers
+	var n int // number of callers
 	var lastIndex int
 
 	// Remove package name from function name and append ().
@@ -297,7 +305,7 @@ func PrintCaller() {
 		_, _ = fmt.Fprintf(os.Stderr, "%s ERROR: no called\n", FuncName())
 		return
 	}
-	called := runtime.FuncForPC(fpcs[0]-1)
+	called := runtime.FuncForPC(fpcs[0] - 1)
 	if called == nil {
 		_, _ = fmt.Fprintf(os.Stderr, "%s ERROR: called was nil\n", FuncName())
 		return
@@ -311,7 +319,7 @@ func PrintCaller() {
 		_, _ = fmt.Fprintf(os.Stderr, "%s ERROR: no caller\n", FuncName())
 		return
 	}
-	caller := runtime.FuncForPC(fpcs[0]-1)
+	caller := runtime.FuncForPC(fpcs[0] - 1)
 	if caller == nil {
 		_, _ = fmt.Fprintf(os.Stderr, "%s ERROR: caller was nil\n", FuncName())
 		return
@@ -320,7 +328,7 @@ func PrintCaller() {
 	callerName = funcBaseName(callerName)
 
 	// Get the file name and line number
-	fileName, lineNum := caller.FileLine(fpcs[0]-1)
+	fileName, lineNum := caller.FileLine(fpcs[0] - 1)
 	fileName = filepath.Base(fileName)
 	callerFile = fmt.Sprintf("%s[%d]", fileName, lineNum)
 
@@ -399,7 +407,7 @@ func CanReadFromPipe() (bool, error) {
 		return false, err
 	}
 
-	if info.Mode() & os.ModeCharDevice != 0 || info.Size() <= 0 {
+	if info.Mode()&os.ModeCharDevice != 0 || info.Size() <= 0 {
 		return true, nil
 	}
 
@@ -432,7 +440,6 @@ func GulpFromPipe() (string, error) {
 	return string(output), nil
 }
 
-
 /*
 	Read and return piped input as a string.
 
@@ -450,10 +457,10 @@ func GulpFromPipeWithTimeout(timeout time.Duration) (input string, err error) {
 	}()
 
 	select {
-		case result := <- c1:
-			return result, nil
-		case <- time.After(timeout):
-			return "", fmt.Errorf("did not read any piped input from stdin after waiting %v", timeout)
+	case result := <-c1:
+		return result, nil
+	case <-time.After(timeout):
+		return "", fmt.Errorf("did not read any piped input from stdin after waiting %v", timeout)
 	}
 
 	return
