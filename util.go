@@ -482,3 +482,19 @@ func IsCommandInstalled(commandName string) (bool, error) {
 func ProgName() string {
 	return filepath.Base(os.Args[0])
 }
+
+/*
+	Return a string with the build date/time and (seconds-ago) of the executable and where it is installed.
+*/
+func BuildTime() (buildTime string) {
+    executableName := os.Args[0]
+    stat, err := os.Stat(executableName)
+    if err == nil {
+        ago := time.Now().Sub(stat.ModTime()).Truncate(time.Second)
+        executableName = strings.Replace(executableName, ".exe", "", 1)
+        executableName = filepath.Base(executableName)
+        buildTime = fmt.Sprintf("    %s.go built %s (%v ago) installed %s\n",
+            executableName, stat.ModTime().Format(time.UnixDate), ago, os.Args[0])
+    }
+    return
+}
