@@ -224,7 +224,7 @@ func FilepathAbs(inputPath string) (path string, err error) {
 	NOTE: As per egonelbre suggestion
 	(see https://www.reddit.com/r/golang/comments/9umtp2/beta_release_of_flattables_go_flatbuffers/e95iffn/?context=3) gotables
 	and flattables now calls go/format/Source() to format code.
-	github.com/urban-wombat/util/GoFmtProgramString() will be deprecated at some point.
+	github.com/urban-wombat/util/GoFmtProgramString() will be DEPRECATED at some point.
 
 	Pipe a Go program file (as a string) through the Go tool gofmt and return its output.
 
