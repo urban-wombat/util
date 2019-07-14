@@ -493,7 +493,7 @@ func BuildTime() (buildTime string) {
 		ago := time.Now().Sub(stat.ModTime()).Truncate(time.Second)
 		executableName = strings.Replace(executableName, ".exe", "", 1)
 		executableName = filepath.Base(executableName)
-		buildTime = fmt.Sprintf("    %s.go built %s (%v ago) installed %s\n",
+		buildTime = fmt.Sprintf("%s.go built %s (%v ago) installed %s\n",
 			executableName, stat.ModTime().Format(time.UnixDate), ago, os.Args[0])
 	}
 	return
