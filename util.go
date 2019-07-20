@@ -490,7 +490,7 @@ func BuildTime() (buildTime string) {
 	executableName := os.Args[0]
 	stat, err := os.Stat(executableName)
 	if err == nil {
-		ago := time.Now().Sub(stat.ModTime()).Truncate(time.Second)
+		var ago time.Duration = time.Now().Sub(stat.ModTime()).Truncate(time.Second)
 		executableName = strings.Replace(executableName, ".exe", "", 1)
 		executableName = filepath.Base(executableName)
 		buildTime = fmt.Sprintf("%s.go built %s (%v ago) installed %s\n",
