@@ -226,7 +226,16 @@ func FilepathAbs(inputPath string) (path string, err error) {
 	and flattables now calls go/format/Source() to format code.
 	github.com/urban-wombat/util/GoFmtProgramString() will be DEPRECATED at some point.
 
-	Pipe a Go program file (as a string) through the Go tool gofmt and return its output.
+	Instead use go/format.Source() as follows:
+
+		import "go/format"
+
+		var myGoCode string	// code to be formatted
+		var goCodeBytes []byte
+		goCodeBytes, err = format.Source([]byte(myGoCode))
+		myGoCode = string(goCodeBytes)
+
+	GoFmtProgramString() pipes a Go program file (as a string) through the Go tool gofmt and returns its output.
 
 	Use it to tidy up generated Go source code before writing it to file.
 
