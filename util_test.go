@@ -1,24 +1,26 @@
 package util
 
 import (
-	"fmt"
 	"testing"
 )
 
-func TestGoFmtProgramString(t *testing.T) {
-
-	var deprecationMsg string = `
-	util.GoFmtProgramString() will be DEPRECATED
-
-	Instead use go/format.Source() as follows:
-
-		import "go/format"
-	
-		var myGoCode string	// code to be formatted
-		var goCodeBytes []byte
-		goCodeBytes, err = format.Source([]byte(myGoCode))
-		myGoCode = string(goCodeBytes)
+func TestFormatSource(t *testing.T) {
+	source := `
+	if err != nil { return nil }
 	`
 
-	fmt.Println(deprecationMsg)
+	expected := `
+	if err != nil {
+		return nil
+	}
+	`
+
+	formatted, err := FormatSource(source)
+	if err != nil {
+		t.Error(err)
+	}
+
+	if formatted != expected {
+		t.Errorf("expecting %s but got %s", expected, formatted)
+	}
 }
