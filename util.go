@@ -503,7 +503,7 @@ func ProgName() string {
 /*
 	Return a string with the build date/time and (seconds-ago) of the executable and where it is installed.
 */
-func BuildTime() (buildTime string) {
+func BuildDateTime() (buildTime string) {
 	executableName := os.Args[0]
 	stat, err := os.Stat(executableName)
 	if err == nil {
