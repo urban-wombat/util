@@ -350,9 +350,18 @@ func PrintCaller() {
 	fileName = filepath.Base(fileName)
 	callerFile = fmt.Sprintf("%s[%d]", fileName, lineNum)
 
-	_, _ = fmt.Fprintf(os.Stderr, "%s called by %s at %s\n", calledName, callerName, callerFile)
+	_, _ = fmt.Fprintf(os.Stderr, "PrintCaller() %s called by %s at %s\n", calledName, callerName, callerFile)
 }
 
+/*
+	Short function name with parentheses.
+
+		pkgName.funcName
+
+	becomes:
+
+		funcName()
+*/
 func FuncName() string {
 	pc, _, _, _ := runtime.Caller(1)
 	nameFull := runtime.FuncForPC(pc).Name() // main.foo
@@ -361,6 +370,23 @@ func FuncName() string {
 	return name + "()"
 }
 
+func FuncCaller() string {
+	pc, _, _, _ := runtime.Caller(2)
+	nameFull := runtime.FuncForPC(pc).Name() // main.foo
+	nameEnd := filepath.Ext(nameFull)        // .foo
+	name := strings.TrimPrefix(nameEnd, ".") // foo
+	return name + "()"
+}
+
+/*
+	Short function name with NO parentheses.
+
+		pkgName.funcName
+
+	becomes:
+
+		funcName
+*/
 func FuncNameNoParens() string {
 	pc, _, _, _ := runtime.Caller(1)
 	nameFull := runtime.FuncForPC(pc).Name() // main.foo
@@ -369,6 +395,11 @@ func FuncNameNoParens() string {
 	return name
 }
 
+/*
+	Full path of function source code with line number followed by full package name of function. Like this:
+
+		<mydrive>/golang/src/github.com/urban-wombat/util/util_test.go[39] github.com/urban-wombat/util.TestFuncNameFull
+*/
 func FuncNameFull() string {
 	pc, sourceFile, lineNumber, ok := runtime.Caller(1)
 	if !ok {
@@ -378,6 +409,11 @@ func FuncNameFull() string {
 	return fmt.Sprintf("%s[%d] %s", sourceFile, lineNumber, nameFull)
 }
 
+/*
+	Short source file name and line number. Like this:
+
+		util_test.go[39]
+*/
 func FuncSource() string {
 	_, sourceFile, lineNumber, ok := runtime.Caller(1)
 	if !ok {
