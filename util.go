@@ -227,7 +227,7 @@ func FilepathAbs(inputPath string) (path string, err error) {
 	and flattables now calls go/format/Source() to format code.
 	github.com/urban-wombat/util/GoFmtProgramString() will be DEPRECATED at some point.
 
-	Instead use util.FormatSource()
+	Instead use go.format.Source()
 
 		util.FormatSource()
 
@@ -303,6 +303,7 @@ func PrintCaller() {
 	var calledName string
 	var callerFile string
 	var callerName string
+
 	var n int // number of callers
 	var lastIndex int
 
@@ -350,7 +351,7 @@ func PrintCaller() {
 	fileName = filepath.Base(fileName)
 	callerFile = fmt.Sprintf("%s[%d]", fileName, lineNum)
 
-	_, _ = fmt.Fprintf(os.Stderr, "PrintCaller() %s called by %s at %s\n", calledName, callerName, callerFile)
+	_, _ = fmt.Fprintf(os.Stderr, "util.PrintCaller(): %s called by %s at %s\n", calledName, callerName, callerFile)
 }
 
 /*
